@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3. DN :: OIS 2020/2021</title>
+    <link href="knjiznice/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {padding-top: 70px;}
+    </style>
+    <link rel="icon" href="./favicon.png"/>
+    <script src="knjiznice/js/jquery-2.2.3.min.js"></script>
+    <script src="knjiznice/js/bootstrap.min.js"></script>
+    <script src="knjiznice/js/koda.js"></script>
+    <script src="knjiznice/js/d3.js"></script>
+    <script src="knjiznice/js/uporabnik.js"></script>
+</head>
+<body>
+    <!-- ZAČETEK: Menujska vrstica na vrhu spletne strani -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menujska-vrstica">
+                    <span class="sr-only">Prikaži menu</span>
+                    <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+                <!-- ZAČETEK: Ime vaše aplikacije -->
+                <a class="navbar-brand" href="index.html">Karantena-Info</a>
+                <!-- KONEC: Ime vaše aplikacije -->
+            </div>
+            <div class="collapse navbar-collapse" id="menujska-vrstica">
+                <ul class="nav navbar-nav">
+                    <li><a href="opis.html">Opis ideje</a></li>
+                    <li><a href="nacrt.html" >Načrt informacijske rešitve</a></li>
+                    <li><a href="#" onclick="generirajPodatke(1)">Generiranje podatkov</a></li>
+                    <li><a href="https://ropsten.etherscan.io/address/0x7AB367F29C27ed01C2d8D7ED0844625196d9CAda"
+                           target="_blank" onclick="pridobiZeton()">Blockchain certifikat kakovosti</a></li>
+                    <li><a href="index.html">Odjava</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+<!-- KONEC: Menujska vrstica na vrhu spletne strani -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" id="meritveEHRPrikaz">
+                        <h4>Prosim izberite vaš EHR na naslovni strani!</h4>
+                    </div>
+                    <div class="panel-body" id="meritvePrikaz">
+                        <button type="button" class="btn btn-primary btn-xs" onclick="prikazMeritev(0)">Prikaz meritev temperature</button>
+                        <button type="button" class="btn btn-primary btn-xs" onclick="prikazMeritev(1)">Prikaz meritev nasičenosti kisika v krvi</button>
+                        <button type="button" class="btn btn-primary btn-xs" onclick="prikazMeritev(2)">Prikaz vseh meritev</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h4>Aktualni nasveti na podlagi vašega zdravstvenega stanja:</h4>
+                    </div>
+                    <div class="panel-body" div id="nasvetiID">
+                        <h4>Za podajanje nasvetov prosim dodajte novo meritev!</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h4>Dodajte novo meritev:</h4>
+                    </div>
+                    <div class="panel-body">
+                        <span class="label label-default">Dan Meritve</span><input id="novaMeritevDatum" type="date" class="form-control input-mini">
+                        <span class="label label-default">Temperatura</span><input id="novaMeritevTemperatura" type="text" class="form-control">
+                        <span class="label label-default">Nasičenost krvi s kisikom</span><input id="novaMeritevKisik" type="text" class="form-control">
+                        <div class="row" style="padding-left:15px">
+                            <span class="label label-default">Izberite vaše simptome:</span>
+                        </div>
+                        <div class="checkbox-inline">
+                            <input class="form-check-input" type="checkbox" id="suhKaselj" value="Suh kašelj">
+                            <label class="form-check-label" for="suhKaselj">Suh kašelj</label>
+                        </div>
+                        <div class="checkbox-inline">
+                            <input class="form-check-input" type="checkbox" id="utrujenost" value="Utrujenost">
+                            <label class="form-check-label" for="Utrujenost">Utrujenost</label>
+                        </div>
+                        <div class="checkbox-inline">
+                            <input class="form-check-input" type="checkbox" id="boleceGrlo" value="Boleče grlo">
+                            <label class="form-check-label" for="boleceGrlo">Boleče grlo</label>
+                        </div>
+                        <div class="checkbox-inline">
+                            <input class="form-check-input" type="checkbox" id="glavobol" value="Glavobol">
+                            <label class="form-check-label" for="glavobol">Glavobol</label>
+                        </div>
+                        <div class="checkbox-inline">
+                            <input class="form-check-input" type="checkbox" id="izgubaOkusa" value="Izguba okusa">
+                            <label class="form-check-label" for="izgubaOkusa">Izguba okusa</label>
+                        </div>
+                        <div class="row" style="padding-left:15px">
+                            <button type="button" class="btn btn-primary btn-xs" onclick="novaMeritev()">Dodajte Meritev</button>
+                            <label class="label label-warning" id="meritevSporocilo"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h4>Tedensko število obolelih s COVID-19 v zadnjih 6 mesecih  v Sloveniji:</h4>
+                    </div>
+                    <div>
+                       <div class="panel-body" id="graf">
+
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let margin = {top: 10, right: 30, bottom: 30, left: 40},
+            width = 650 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+
+        let svg = d3.select("#graf")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.json("https://api.sledilnik.org/api/stats-weekly").then(function(data) {
+
+            let leto = data.length - 27;
+            for (let i = 0; i < leto; i++)
+                data.shift();
+            console.log(data.length);
+            for (let i = 0; i < data.length; i++) {
+                let s = data[i].year + " " + (data[i].month - 1) + " " + data[i].day;
+                let format = d3.timeParse("%Y %m %d");
+                data[i].date = format(s);
+            }
+
+            let x = d3.scaleTime()
+                .domain(d3.extent(data, function(d) { return d.date; }))
+                .range([ 0, width ]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+            // Add Y axis
+            let y = d3.scaleLinear()
+                .domain([0, d3.max(data, function(d) { return +d.confirmed; })])
+                .range([ height, 0 ]);
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(d.confirmed) })
+                )
+        })
+    </script>
+
+</body>
+</html>
